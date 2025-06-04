@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseMotionListener;
 
@@ -19,10 +20,19 @@ public class Game implements Runnable, MouseMotionListener {
         int gridRows = mazeLevel1.getRowCount();
         cellSize = Math.min(WINDOW_WIDTH/gridCols, WINDOW_HEIGHT/gridRows);
 
-        rayCaster = new RayCaster(mazeLevel1, cellSize){
+        rayCaster = new RayCaster(mazeLevel1, cellSize);
 
-        }
-
+        setupWindow();
+        new Thread(this).start();
     }
 
+    private void setupWindow(){
+        JFrame frame = new JFrame("Game - Level 1");
+        frame.getDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.add(canvas = new Canvas());
+        frame.addMouseMotionListener(this);
+        frame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
 }
