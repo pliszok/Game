@@ -8,9 +8,9 @@ public class RayCaster {
     private final int maxDist = Settings.VISIBILITY;
     private final int numRays = Settings.NUM_RAYS;
 
-    public RayCaster(Maze maze, int cellSize){
+    public RayCaster(Maze maze){
         this.maze = maze;
-        this.cellSize = cellSize;
+        this.cellSize = maze.getCellSize();
     }
 
     //List of rays from [x,y] to maxDist

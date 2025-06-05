@@ -18,4 +18,12 @@ public class Maze {
      public int [][] getGrid(){
         return grid;
      }
+     public boolean isWall(float x, float y){
+        int col = (int) x/getCellSize();
+        int row = (int) y/getCellSize();
+        return getCell(row,col) == 1;
+     }
+     public int getCellSize(){
+        return Math.min(Settings.WINDOW_WIDTH/getColCount(), Settings.WINDOW_HEIGHT/getRowCount());
+     }
 }
