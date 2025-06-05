@@ -8,8 +8,6 @@ import java.util.LinkedList;
 
 public class Game implements Runnable, MouseMotionListener {
 
-    private static final int WINDOW_WIDTH = 800;
-    private static final int WINDOW_HEIGHT = 800;
     private Canvas canvas;
     private int mouseX = 0, mouseY = 0;
     private final Maze maze;
@@ -23,7 +21,7 @@ public class Game implements Runnable, MouseMotionListener {
 
         int gridCols = mazeLevel1.getColCount();
         int gridRows = mazeLevel1.getRowCount();
-        cellSize = Math.min(WINDOW_WIDTH/gridCols, WINDOW_HEIGHT/gridRows);
+        cellSize = Math.min(Settings.WINDOW_WIDTH/gridCols, Settings.WINDOW_HEIGHT/gridRows);
 
         rayCaster = new RayCaster(mazeLevel1, cellSize);
 
@@ -36,7 +34,7 @@ public class Game implements Runnable, MouseMotionListener {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.add(canvas = new Canvas());
         canvas.addMouseMotionListener(this);
-        frame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+        frame.setSize(Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
@@ -46,7 +44,7 @@ public class Game implements Runnable, MouseMotionListener {
         while (true){
             render();
             try {
-                Thread.sleep(16);
+                Thread.sleep(Settings.FRAME_DELAY);
             }
             catch (InterruptedException e){
                 e.printStackTrace();
@@ -63,7 +61,7 @@ public class Game implements Runnable, MouseMotionListener {
 
         Graphics g = bs.getDrawGraphics();
         g.setColor(Color.BLACK);
-        g.fillRect(0,0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        g.fillRect(0,0, Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT);
 
         drawMaze(g);
         drawRays(g);
@@ -87,7 +85,7 @@ public class Game implements Runnable, MouseMotionListener {
     }
 
     private void drawRays(Graphics g){
-        LinkedList<Line2D.Float> rays = rayCaster.castRays(mouseX, mouseY, 360, 150);
+        LinkedList<Line2D.Float> rays = rayCaster.castRays(mouseX, mouseY);
         g.setColor(Color.GREEN);
         for (Line2D.Float ray : rays){
             g.drawLine((int) ray.x1, (int) ray.y1, (int) ray.x2, (int) ray.y2);

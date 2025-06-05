@@ -5,7 +5,8 @@ public class RayCaster {
 
     private final Maze maze;
     private final int cellSize;
-    private final int maxDist = 250;
+    private final int maxDist = Settings.VISIBILITY;
+    private final int numRays = Settings.NUM_RAYS;
 
     public RayCaster(Maze maze, int cellSize){
         this.maze = maze;
@@ -13,7 +14,7 @@ public class RayCaster {
     }
 
     //List of rays from [x,y] to maxDist
-    public LinkedList<Line2D.Float> castRays (int x, int y, int numRays, int maxDist){
+    public LinkedList<Line2D.Float> castRays (int x, int y){
         LinkedList<Line2D.Float> rays = new LinkedList<>();
         int rowCount = maze.getRowCount();
         int colCount = maze.getColCount();
