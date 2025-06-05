@@ -2,13 +2,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferStrategy;
 import java.util.LinkedList;
 
-public class Game implements Runnable, MouseMotionListener, KeyListener {
+public class Game implements Runnable, KeyListener {
 
     private Canvas canvas;
     private int mouseX = 0, mouseY = 0;
@@ -23,13 +21,12 @@ public class Game implements Runnable, MouseMotionListener, KeyListener {
         Maze mazeLevel1 = new Maze(Level.loadLevel(1));
         this.maze = mazeLevel1;
 
-        int gridCols = mazeLevel1.getColCount();
-        int gridRows = mazeLevel1.getRowCount();
         cellSize = mazeLevel1.getCellSize();
 
         rayCaster = new RayCaster(mazeLevel1);
 
         setupWindow();
+        canvas.createBufferStrategy(2);
         new Thread(this).start();
     }
 
@@ -37,13 +34,13 @@ public class Game implements Runnable, MouseMotionListener, KeyListener {
         JFrame frame = new JFrame("Game - Level 1");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.add(canvas = new Canvas());
-        canvas.addMouseMotionListener(this);
+//        canvas.addMouseMotionListener(this);
         canvas.addKeyListener(this);
         canvas.setFocusable(true);
-        canvas.requestFocus();
         frame.setSize(Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+        canvas.requestFocusInWindow();
     }
 
     @Override
@@ -84,9 +81,6 @@ public class Game implements Runnable, MouseMotionListener, KeyListener {
                 player.y = newY;
             }
         }
-
-
-
     }
 
     private void render(){
@@ -122,23 +116,23 @@ public class Game implements Runnable, MouseMotionListener, KeyListener {
     }
 
     private void drawRays(Graphics g){
-        LinkedList<Line2D.Float> rays = rayCaster.castRays(mouseX, mouseY);
+        LinkedList<Line2D.Float> rays = rayCaster.castRays((int)player.x, (int)player.y, player.angle);
         g.setColor(Color.GREEN);
         for (Line2D.Float ray : rays){
             g.drawLine((int) ray.x1, (int) ray.y1, (int) ray.x2, (int) ray.y2);
         }
     }
 
-    @Override
-    public void mouseMoved(MouseEvent e){
-        mouseX = e.getX();
-        mouseY = e.getY();
-    }
+//    @Override
+//    public void mouseMoved(MouseEvent e){
+//        mouseX = e.getX();
+//        mouseY = e.getY();
+//    }
 
-    @Override
-    public void mouseDragged(MouseEvent e){
-        mouseMoved(e);
-    }
+//    @Override
+//    public void mouseDragged(MouseEvent e){
+//        mouseMoved(e);
+//    }
 
     @Override
     public void keyPressed(KeyEvent e){

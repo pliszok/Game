@@ -14,13 +14,14 @@ public class RayCaster {
     }
 
     //List of rays from [x,y] to maxDist
-    public LinkedList<Line2D.Float> castRays (int x, int y){
+    public LinkedList<Line2D.Float> castRays (int x, int y, float angle){
         LinkedList<Line2D.Float> rays = new LinkedList<>();
         int rowCount = maze.getRowCount();
         int colCount = maze.getColCount();
+        float fov = (float)Math.toRadians(Settings.FOV);
 
             for (int i = 0; i < numRays; i++){
-                double angle = (Math.PI * 2) * ((double) i / numRays);  //Angle in radians (full circle 2PI)
+                float rayAngle = angle - fov/2 + fov * i/numRays;  //Angle in radians (full circle 2PI)
                 float minDist = maxDist;
 
                 for (int wallRow = 0; wallRow < rowCount; wallRow++){
@@ -28,14 +29,14 @@ public class RayCaster {
                     for (int wallCol = 0; wallCol < colCount; wallCol++){
 
                         if(maze.getCell(wallRow,wallCol) == 1){  //Checks cells for 1 = wall or 0 = space
-                            float dist = checkWallCollision(x, y, angle, wallRow, wallCol);
+                            float dist = checkWallCollision(x, y, rayAngle, wallRow, wallCol);
                             if(dist < minDist && dist >0){
                                 minDist = dist; //if the new collision is in shorter distance than previous - it is new distance
                             }
                         }
                     }
                 }
-                rays.add(new Line2D.Float(x, y, x + (float) Math.cos(angle) * minDist, y + (float) Math.sin(angle) * minDist));
+                rays.add(new Line2D.Float(x, y, x + (float) Math.cos(rayAngle) * minDist, y + (float) Math.sin(rayAngle) * minDist));
             }
             return rays;
         }
