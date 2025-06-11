@@ -7,12 +7,11 @@ import java.awt.image.BufferStrategy;
 public class Game implements Runnable, KeyListener {
 
     private Canvas canvas;
-    private int mouseX = 0, mouseY = 0;
     private final Maze maze;
     private final RayCaster rayCaster;
     private final int cellSize;
     private boolean upPressed, downPressed, rightPressed, leftPressed;
-    private final Player player = new Player(100,100,0);
+    private final Player player = new Player(100,100,0); //Settings? Depending on level?
 
 
     public Game() {
@@ -120,15 +119,11 @@ public class Game implements Runnable, KeyListener {
             int startY = height / 2 - lineHeight / 2;
 
             // Shade based on distance
-            int brightness = Math.max(0, 255 - (int)(dist * 0.1));
+            int brightness = Math.max(0, 255 - (int)(dist * 0.1));//should add to settings?
             g.setColor(new Color(brightness, brightness, brightness));
 
             // Draw vertical slice
             int sliceWidth = width / distances.length;
-            int x = i * sliceWidth;
-            if (i == distances.length - 1) {
-                sliceWidth = width - x;
-            }
             g.fillRect(i * sliceWidth, startY, sliceWidth, lineHeight);
         }
     }
@@ -154,6 +149,6 @@ public class Game implements Runnable, KeyListener {
     }
 
     @Override
-    public void keyTyped(KeyEvent e){};
-
+    public void keyTyped(KeyEvent e) {
+    }
 }

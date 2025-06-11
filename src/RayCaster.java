@@ -1,21 +1,17 @@
-
 public class RayCaster {
 
     private final Maze maze;
-    private final int cellSize;
-    private final int numRays = Settings.NUM_RAYS;
 
     public RayCaster(Maze maze){
         this.maze = maze;
-        this.cellSize = maze.getCellSize();
     }
 
     public float [] castRayDistances (float x,float y, float angle){
         float [] distances = new float[Settings.NUM_RAYS];
-        float fov = (float) Math.toRadians(60);
+        float fov = (float) Math.toRadians(Settings.FOV);
 
         for ( int i = 0; i < Settings.NUM_RAYS; i++){
-            float rayAngle = angle - fov/2 + fov*i/Settings.NUM_RAYS - 1;
+            float rayAngle = angle - fov/2 + fov * i/Settings.NUM_RAYS;
             float dist = castSingleRay(x, y, rayAngle);
             distances[i] = dist;
         }
