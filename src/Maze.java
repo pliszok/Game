@@ -15,9 +15,6 @@ public class Maze {
      public int getColCount(){
         return grid[0].length;
      }
-     public int [][] getGrid(){
-        return grid;
-     }
      public boolean isWall(float x, float y){
         int col = (int) x/getCellSize();
         int row = (int) y/getCellSize();

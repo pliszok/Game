@@ -2,9 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.geom.Line2D;
 import java.awt.image.BufferStrategy;
-import java.util.LinkedList;
 
 public class Game implements Runnable, KeyListener {
 
@@ -20,13 +18,13 @@ public class Game implements Runnable, KeyListener {
     public Game() {
         Maze mazeLevel1 = new Maze(Level.loadLevel(1));
         this.maze = mazeLevel1;
-
         cellSize = mazeLevel1.getCellSize();
-
         rayCaster = new RayCaster(mazeLevel1);
-
         setupWindow();
         canvas.createBufferStrategy(2);
+    }
+
+    public void start(){
         new Thread(this).start();
     }
 
@@ -34,7 +32,6 @@ public class Game implements Runnable, KeyListener {
         JFrame frame = new JFrame("Game - Level 1");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.add(canvas = new Canvas());
-//        canvas.addMouseMotionListener(this);
         canvas.addKeyListener(this);
         canvas.setFocusable(true);
         frame.setSize(Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT);
@@ -52,17 +49,17 @@ public class Game implements Runnable, KeyListener {
                 Thread.sleep(Settings.FRAME_DELAY);
             }
             catch (InterruptedException e){
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
     }
 
     private  void updatePlayer(){
-        if(leftPressed) player.angle -= player.rotSpeed;
-        if(rightPressed) player.angle += player.rotSpeed;
+        if(leftPressed) player.angle -= Settings.ROT_SPEED;
+        if(rightPressed) player.angle += Settings.ROT_SPEED;
 
-        float dx = (float)Math.cos(player.angle) * player.moveSpeed;
-        float dy = (float)Math.sin(player.angle) * player.moveSpeed;
+        float dx = (float)Math.cos(player.angle) * Settings.MOVE_SPEED;
+        float dy = (float)Math.sin(player.angle) * Settings.MOVE_SPEED;
 
         if(upPressed){
             float newX = player.x + dx;
@@ -91,48 +88,50 @@ public class Game implements Runnable, KeyListener {
         }
 
         Graphics g = bs.getDrawGraphics();
-        g.setColor(Color.BLACK);
-        g.fillRect(0,0, Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT);
+        g.setColor(Color.CYAN);
+        g.fillRect(0,0, Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT/2);
+        g.setColor(Color.DARK_GRAY);
+        g.fillRect(0, Settings.WINDOW_HEIGHT/2, Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT/2);
 
-        drawMaze(g);
-        drawRays(g);
+        draw3dView(g);
 
         g.dispose();
         bs.show();
     }
 
-    private void drawMaze(Graphics g){
-        for(int row = 0; row < maze.getRowCount(); row++){
-            for(int col = 0; col < maze.getColCount(); col++){
-                if(maze.getCell(row,col) == 1){
-                    g.setColor(Color.GRAY);
-                }
-                else {
-                    g.setColor(Color.WHITE);
-                }
-                g.fillRect(col*cellSize, row*cellSize, cellSize, cellSize);
+    public void draw3dView(Graphics g){
+        float[] distances = rayCaster.castRayDistances(player.x, player.y, player.angle);
+        float fov = (float) Math.toRadians(Settings.FOV);
+        int width = Settings.WINDOW_WIDTH;
+        int height = Settings.WINDOW_HEIGHT;
+
+        for (int i = 0; i < distances.length; i++){
+            float dist = distances[i];
+
+            // Fix fish-eye effect
+            float angleOffset = -fov / 2 + (fov * i / distances.length);
+            dist *= Math.cos(angleOffset);
+
+            // Prevent zero distance
+            dist = Math.max(dist, 1f);
+
+            // Calculate wall slice height
+            int lineHeight = (int) (cellSize * Settings.WALL_SCALING / dist); // scaling factor
+            int startY = height / 2 - lineHeight / 2;
+
+            // Shade based on distance
+            int brightness = Math.max(0, 255 - (int)(dist * 0.1));
+            g.setColor(new Color(brightness, brightness, brightness));
+
+            // Draw vertical slice
+            int sliceWidth = width / distances.length;
+            int x = i * sliceWidth;
+            if (i == distances.length - 1) {
+                sliceWidth = width - x;
             }
+            g.fillRect(i * sliceWidth, startY, sliceWidth, lineHeight);
         }
     }
-
-    private void drawRays(Graphics g){
-        LinkedList<Line2D.Float> rays = rayCaster.castRays((int)player.x, (int)player.y, player.angle);
-        g.setColor(Color.GREEN);
-        for (Line2D.Float ray : rays){
-            g.drawLine((int) ray.x1, (int) ray.y1, (int) ray.x2, (int) ray.y2);
-        }
-    }
-
-//    @Override
-//    public void mouseMoved(MouseEvent e){
-//        mouseX = e.getX();
-//        mouseY = e.getY();
-//    }
-
-//    @Override
-//    public void mouseDragged(MouseEvent e){
-//        mouseMoved(e);
-//    }
 
     @Override
     public void keyPressed(KeyEvent e){
@@ -156,7 +155,5 @@ public class Game implements Runnable, KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e){};
-
-
 
 }
